@@ -1,0 +1,103 @@
+Part 1: Research & Documentation 
+Each team must research and write a short report that includes the following: 
+1. Types of Views in SQL Server: 
+o Standard View 
+
+A Standard View is a virtual table created using a SELECT statement. It does not store data physically; instead, it retrieves data dynamically from underlying tables whenever it is queried.
+
+Key Differences from Other View Types:
+-Does not store data physically
+-Simplest type of view
+-No indexing allowed
+-Mainly used for simplicity and security
+
+Real-Life Use Case (Banking System):
+In a banking system, a standard view can be used to allow call center agents to view customer names, account numbers, and balances without exposing sensitive data such as national ID numbers.
+
+Limitations and Performance Considerations:
+-Performance depends on the underlying tables
+-Re-executes the query each time it is called
+-Not suitable for heavy aggregation or performance-critical queries
+
+o Indexed View 
+An Indexed View is a view where the result set is stored physically on disk and indexed. This improves performance for complex queries involving aggregations.
+
+Key Differences from Other View Types:
+-Stores data physically
+-Requires WITH SCHEMABINDING
+-Improves query performance
+-Consumes storage space
+
+Real-Life Use Case (Banking System):
+Used to quickly calculate total balances per customer for financial reporting or fraud detection systems where performance is critical.
+
+Limitations and Performance Considerations:
+-Slower INSERT, UPDATE, DELETE operations on base tables
+-Strict rules on view definition
+-Increased storage usage
+
+o Partitioned View (Union View) 
+A Partitioned View combines multiple tables with the same structure using UNION ALL. It is commonly used to manage large datasets.
+
+Key Differences from Other View Types:
+-Combines multiple tables
+-Useful for horizontal data partitioning
+-Handles large volumes of data
+
+Real-Life Use Case (Banking System):
+Transaction tables can be split by year (e.g., Transactions_2023, Transactions_2024) and accessed through a single partitioned view.
+
+Limitations and Performance Considerations:
+-All tables must have identical structure
+-Can be complex to maintain
+-Performance depends on indexing and partition strategy
+
+1. Can We Use DML (INSERT, UPDATE, DELETE) on Views? 
+• Do some research and explain: 
+o Which types of views allow DML operations? 
+-Standard Views → Yes (with restrictions)
+-Indexed Views → Yes (indirectly via base tables)
+-Partitioned Views → Limited support
+
+o What are the restrictions or limitations when performing DML on a view? 
+DML is allowed only if:
+-View references one base table
+-No GROUP BY, DISTINCT, UNION, or aggregate functions
+-No calculated columns
+-No joins (for INSERT)
+
+o Give at least one real-life example where updating a view is useful (e.g., HR 
+system, e-commerce orders, etc.)
+-Updating customer contact details through a secure view
+-Prevents direct access to full customer records
+
+2. How Can Views Simplify Complex Queries? 
+• Explain how a View can help simplify JOIN-heavy queries. 
+Simplifying JOIN-Heavy Queries
+Views hide complex JOIN logic and allow users to query data as if it were a single table.
+
+• Create an example view that joins at least two of your banking tables, such as: 
+o Customer + Account 
+o Account + Transaction 
+
+Customers(CustomerID, Name, Phone)
+
+Accounts(AccountID, CustomerID, Balance)
+
+Complex Query Without View:
+SELECT c.Name, a.AccountID, a.Balance
+FROM Customers c
+JOIN Accounts a ON c.CustomerID = a.CustomerID;
+
+Creating a View:
+CREATE VIEW vw_CustomerAccountSummary
+AS
+SELECT c.CustomerID, c.Name, a.AccountID, a.Balance
+FROM Customers c
+JOIN Accounts a ON c.CustomerID = a.CustomerID;
+
+Query Using the View:
+SELECT * FROM vw_CustomerAccountSummary
+WHERE Balance > 10000;
+
+• Show how using the view reduces the need to repeat long queries. 

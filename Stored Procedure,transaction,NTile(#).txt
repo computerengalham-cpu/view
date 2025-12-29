@@ -1,0 +1,143 @@
+What is a Stored Procedure?
+
+A Stored Procedure is a pre-written SQL program stored in the database that can be executed many times.
+
+Instead of writing SQL queries again and again, we save them once and call them when needed.
+
+
+Why Use Stored Procedures?
+
+-Improves performance (precompiled)
+
+-Improves security (users don’t access tables directly)
+
+-Reduces code repetition
+
+-Easier maintenance
+
+Example: Banking System Stored Procedure
+Create a Stored Procedure
+
+CREATE PROCEDURE GetCustomerAccounts
+    @CustomerID INT
+AS
+BEGIN
+    SELECT 
+        c.FullName,
+        a.AccountID,
+        a.Balance,
+        a.AccountType
+    FROM Customer c
+    JOIN Account a ON c.CustomerID = a.CustomerID
+    WHERE c.CustomerID = @CustomerID;
+END;
+
+
+Execute the Stored Procedure:
+
+EXEC GetCustomerAccounts @CustomerID = 1;
+
+Stored Procedure with INSERT Example:
+CREATE PROCEDURE AddTransaction
+    @AccountID INT,
+    @Amount DECIMAL(10,2),
+    @Type VARCHAR(10)
+AS
+BEGIN
+    INSERT INTO [Transaction]
+    VALUES (NEWID(), @AccountID, @Amount, @Type, GETDATE());
+END;
+
+
+Advantages:
+
+| Feature         | Benefit                |
+| --------------- | ---------------------- |
+| Performance     | Faster execution       |
+| Security        | No direct table access |
+| Reusability     | Call anytime           |
+| Maintainability | Easy updates           |
+
+
+What is NTILE(#)?
+
+NTILE(n) is a window function that divides rows into n equal groups.
+
+Each row gets a group number (1, 2, 3, …).
+
+Syntax:
+NTILE(n) OVER (ORDER BY column)
+
+Example: Banking Scenario
+Divide Accounts into 4 Groups Based on Balance
+
+SELECT 
+    AccountID,
+    Balance,
+    NTILE(4) OVER (ORDER BY Balance DESC) AS BalanceGroup
+FROM Account;
+
+Result Explanation
+
+Group 1 → Highest balances
+
+Group 4 → Lowest balances
+
+
+Real-Life Use Cases:
+-Customer segmentation (Gold / Silver / Bronze)
+-Ranking salaries
+-Performance analysis
+-Risk analysis in banking
+
+
+What is a Transaction?
+
+A Transaction is a group of SQL statements that must be executed together.
+
+Either:
+
+All succeed ✅
+
+Or all fail ❌ (rollback)
+
+
+Why Use Transactions?
+-Maintain data integrity
+-Prevent partial updates
+-Very important in banking systems
+
+
+ACID Properties
+| Property    | Meaning         |
+| ----------- | --------------- |
+| Atomicity   | All or nothing  |
+| Consistency | Valid state     |
+| Isolation   | No interference |
+| Durability  | Data saved      |
+
+Example: Money Transfer (Banking)
+BEGIN TRANSACTION;
+
+BEGIN TRY
+    -- Withdraw from Account 1
+    UPDATE Account
+    SET Balance = Balance - 1000
+    WHERE AccountID = 101;
+
+    -- Deposit to Account 2
+    UPDATE Account
+    SET Balance = Balance + 1000
+    WHERE AccountID = 102;
+
+    COMMIT TRANSACTION;
+END TRY
+BEGIN CATCH
+    ROLLBACK TRANSACTION;
+END CATCH;
+
+When to Use Transactions?
+-Money transfers
+-Order processing
+-Loan approval
+-Inventory updates
